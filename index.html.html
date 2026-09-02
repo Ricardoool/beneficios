@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Beneficios tarjetas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F7F6F2;
+    --ink:#241F1B;
+    --ink-soft:#6B6255;
+    --card:#FFFFFF;
+    --line:#E7E2D8;
+    --gnb:#5C7A34;
+    --gnb-pale:#E4EAD5;
+    --itau:#EC7000;
+    --itau-pale:#FCE6D2;
+    --navy:#1B2A41;
+    --navy-pale:#E4E9F0;
+    --accent:#B85400;
+    --today-ring:#241F1B;
+    --star:#C98A2B;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Work Sans',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{max-width:720px;margin:0 auto;padding:16px 14px 90px;}
+
+  .top{margin-bottom:14px;}
+  .top h1{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin:0 0 3px;
+  }
+  .top p{
+    margin:0 0 8px;
+    color:var(--ink-soft);
+    font-size:13px;
+    line-height:1.4;
+  }
+  .today-chip{
+    display:inline-block;
+    font-family:'Space Mono',monospace;
+    font-size:11.5px;
+    background:var(--navy);
+    color:#F1F4F9;
+    padding:5px 10px;
+    border-radius:6px;
+  }
+
+  /* favorites-today section */
+  .focus{
+    background:linear-gradient(180deg,#FFF9EE,#FFFDF9);
+    border:1px solid #ECD9AE;
+    border-radius:14px;
+    padding:13px 14px;
+    margin-bottom:16px;
+  }
+  .focus-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:8px;
+  }
+  .focus-head h2{
+    margin:0; font-size:14.5px; font-weight:700;
+    display:flex; align-items:center; gap:5px;
+  }
+  .focus-head .count{
+    font-family:'Space Mono',monospace; font-size:11px; color:var(--ink-soft);
+  }
+  .focus-empty{font-size:12.5px; color:var(--ink-soft); line-height:1.5;}
+  .focus-list{display:flex; flex-direction:column; gap:7px;}
+  .focus-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:9px 11px;
+  }
+  .focus-item .fi-name{font-size:13.5px; font-weight:700;}
+  .focus-item .fi-desc{font-size:11.5px; color:var(--ink-soft); margin-top:2px; line-height:1.35;}
+  .focus-item .fi-badges{display:flex; gap:4px; flex-shrink:0;}
+  .focus-none-today{
+    font-size:12px; color:#9C927F; font-style:italic;
+  }
+
+  /* week strip */
+  .week-wrap{
+    margin-bottom:12px;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .week-wrap::-webkit-scrollbar{display:none;}
+  .week{
+    display:grid;
+    grid-auto-flow:column;
+    grid-auto-columns:minmax(58px,1fr);
+    gap:7px;
+  }
+  .day-cell{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:11px;
+    padding:9px 4px 8px;
+    text-align:center;
+    cursor:pointer;
+    -webkit-user-select:none;
+    user-select:none;
+    min-height:56px;
+  }
+  .day-cell.active{background:var(--ink); border-color:var(--ink);}
+  .day-cell.active .dname, .day-cell.active .dcount{color:#F5F3EE;}
+  .day-cell.is-today{box-shadow:inset 0 0 0 2px var(--today-ring);}
+  .day-cell.active.is-today{box-shadow:none;}
+  .dname{
+    display:block; font-size:10.5px; font-weight:600;
+    color:var(--ink-soft); text-transform:capitalize; margin-bottom:4px;
+  }
+  .dcount{
+    display:block; font-size:17px; font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* search */
+  .search{margin-bottom:10px;}
+  .search input{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    font-family:inherit;
+    font-size:15px;
+    background:var(--card);
+    color:var(--ink);
+    -webkit-appearance:none;
+  }
+  .search input:focus{outline:2px solid var(--ink); outline-offset:1px;}
+  .search input::placeholder{color:#AFA695;}
+
+  .chip-rail{
+    display:flex; gap:7px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; padding-bottom:2px; margin-bottom:8px;
+  }
+  .chip-rail::-webkit-scrollbar{display:none;}
+  .chip{
+    flex:0 0 auto;
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--ink-soft);
+    padding:9px 13px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    white-space:nowrap;
+    min-height:36px;
+    display:flex; align-items:center; gap:4px;
+  }
+  .chip.active{background:var(--ink); border-color:var(--ink); color:#fff;}
+  .chip .n{opacity:.75; font-weight:500;}
+  .chip.bank-gnb.active{background:var(--gnb); border-color:var(--gnb);}
+  .chip.bank-itau.active{background:var(--itau); border-color:var(--itau);}
+  .chip.fav.active{background:var(--star); border-color:var(--star);}
+
+  .meta-row{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:10px; font-size:12.5px; color:var(--ink-soft);
+  }
+  .meta-row button{
+    background:none; border:none; color:var(--accent);
+    font-size:12.5px; font-weight:600; cursor:pointer; padding:6px 0;
+    text-decoration:underline; font-family:inherit;
+  }
+
+  .grid{display:flex; flex-direction:column; gap:10px;}
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    position:relative;
+  }
+  .card.expiring{border-color:#B03A2E;}
+  .card.is-fav{border-color:var(--star);}
+  .card-head{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+  .name-row{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .card h3{margin:0; font-size:15.5px; font-weight:700; letter-spacing:-0.01em; line-height:1.25;}
+  .bank-tag{
+    font-size:9.5px; font-weight:700; padding:2px 6px; border-radius:5px;
+    text-transform:uppercase; letter-spacing:.02em; flex-shrink:0;
+  }
+  .bank-tag.gnb{background:var(--gnb-pale); color:#3F5622;}
+  .bank-tag.itau{background:var(--itau-pale); color:#B85400;}
+  .star-btn{
+    flex-shrink:0;
+    background:none; border:none; cursor:pointer;
+    font-size:22px; line-height:1; padding:2px 4px;
+    color:#D9D2C3;
+  }
+  .star-btn.active{color:var(--star);}
+  .badges{display:flex; gap:5px; flex-wrap:wrap;}
+  .badge{
+    font-family:'Space Mono',monospace; font-size:11px; font-weight:700;
+    padding:3px 7px; border-radius:5px; white-space:nowrap;
+  }
+  .badge.off{background:var(--gnb-pale); color:#3F5622;}
+  .badge.cuotas{background:var(--navy-pale); color:var(--navy);}
+  .badge.itaupct{background:var(--itau-pale); color:#B85400;}
+  .card p.desc{margin:0; font-size:13.5px; color:var(--ink-soft); line-height:1.45;}
+  .card-foot{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:2px; padding-top:8px; border-top:1px solid var(--line);
+    font-size:11.5px; color:#9C927F;
+  }
+  .days-tags{display:flex; gap:4px; flex-wrap:wrap;}
+  .day-tag{
+    font-size:10px; font-weight:600; color:#3F5622;
+    background:var(--gnb-pale); padding:2px 5px; border-radius:4px;
+  }
+  .day-tag.special{
+    color:#8A5A12; background:#FBEBCB;
+  }
+  .expiry{font-family:'Space Mono',monospace; flex-shrink:0; margin-left:8px;}
+  .expiry.soon{color:#B03A2E; font-weight:700;}
+
+  .empty{text-align:center; padding:50px 16px; color:var(--ink-soft); font-size:14px;}
+
+  @media (min-width:600px){
+    .week{grid-auto-columns:1fr; grid-auto-flow:row; grid-template-columns:repeat(7,1fr); display:grid;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top">
+    <h1>Beneficios de mis tarjetas</h1>
+    <p>GNB e Itaú juntos, solo comercios con descuento real (se excluyeron los que son únicamente cuotas sin intereses). Tocá la ☆ para agregar a favoritos.</p>
+    <span class="today-chip" id="todayChip"></span>
+  </div>
+
+  <div class="focus" id="focusSection">
+    <div class="focus-head">
+      <h2>⭐ Mis favoritos de hoy</h2>
+      <span class="count" id="focusCount"></span>
+    </div>
+    <div id="focusBody"><span class="focus-empty">Cargando…</span></div>
+  </div>
+
+  <div class="week-wrap"><div class="week" id="week"></div></div>
+
+  <div class="search">
+    <input type="text" id="searchInput" placeholder="Buscar comercio…">
+  </div>
+
+  <div class="chip-rail" id="bankRail">
+    <button class="chip active" data-bank="all">Todos <span class="n" id="cnt-all"></span></button>
+    <button class="chip bank-gnb" data-bank="GNB">GNB <span class="n" id="cnt-gnb"></span></button>
+    <button class="chip bank-itau" data-bank="Itau">Itaú <span class="n" id="cnt-itau"></span></button>
+  </div>
+  <div class="chip-rail" id="extraRail">
+    <button class="chip fav" data-extra="fav">⭐ Favoritos <span class="n" id="cnt-fav-chip"></span></button>
+    <button class="chip" data-extra="featured">Destacados <span class="n" id="cnt-feat"></span></button>
+    <button class="chip" data-extra="expiring">Vencen pronto <span class="n" id="cnt-exp"></span></button>
+  </div>
+
+  <div class="meta-row">
+    <span id="resultCount"></span>
+    <button id="clearBtn" style="display:none;">Quitar filtros</button>
+  </div>
+
+  <div class="grid" id="cards"></div>
+  <div class="empty" id="emptyState" style="display:none;">No hay beneficios que coincidan con ese filtro.</div>
+</div>
+
+<script>
+// [bank, name, badges[], desc, start, end, highlighted]
+const DATA = [["GNB", "Cinemark", ["-50%"], "50% de descuento los días jueves, viernes, sábados y domingos.", "2025-01-03", "2027-02-28", false], ["GNB", "La Ruta Gastronómica", ["-25%"], "Hasta 25% de reintegro los días sábados y domingos.", "2024-11-30", "2026-11-29", true], ["GNB", "La Ruta del Café", ["-25%"], "Hasta 25% de reintegro de miércoles a domingos.", "2026-07-01", "2026-12-31", true], ["GNB", "Día GNB Casa Rica", ["-20%"], "20% off el miércoles 9 de septiembre del 2026.", "2024-06-01", "2026-09-09", false], ["GNB", "Bares & Restó", ["-25%"], "Hasta 25% de descuento de miércoles a domingos.", "2025-01-09", "2026-12-31", true], ["GNB", "Colegios", ["Off y Cuotas"], "10% de descuento y hasta 12 cuotas sin intereses del 1 al 10 de cada mes.", "2025-01-31", "2026-11-10", false], ["GNB", "Universidades", ["Off y Cuotas"], "15% de reintegro de 1 al 10 de cada mes + hasta 12 cuotas sin intereses.", "2025-02-28", "2026-12-10", false], ["GNB", "Copetrol", ["-30%"], "Hasta 30% off los lunes.", "2024-03-01", "2026-12-28", true], ["GNB", "Cibermiércoles Casa Rica", ["-20%"], "20% de descuento en compras online.", "2024-06-01", "2026-09-09", false], ["GNB", "Petrobras PREMMIA", ["-20%"], "20% de descuento para pagos desde la app Premmia los miércoles.", "2024-01-01", "2026-12-30", true], ["GNB", "GNB Travel+", ["Off y Cuotas"], "Hasta Gs. 2.000.000 de descuento máximo + Hasta 18 cuotas sin intereses todos los días.", "2025-11-17", "2026-12-31", true], ["GNB", "Champs Elysees", ["Off y Cuotas"], "Hasta 25% de descuento los jueves y viernes + Hasta 6 cuotas sin intereses todos los días.", "2026-05-17", "2026-11-27", false], ["GNB", "Springfield", ["Off y Cuotas"], "60% de descuento + Hasta 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "El Negro Suplementos", ["Off y Cuotas"], "Hasta 45% de descuento + Hasta 6 cuotas sin intereses los días viernes.", "2026-07-03", "2026-09-25", false], ["GNB", "Farmacenter", ["Off y Cuotas"], "Hasta 35% de descuento los días lunes + Hasta 3 cuotas sin intereses todos los días.", "2026-03-13", "2026-09-28", false], ["GNB", "Petrosur", ["-20%"], "20% de descuento los días viernes.", "2026-04-30", "2026-12-25", false], ["GNB", "Vernier", ["Off y Cuotas"], "Hasta 25% de descuento los jueves y viernes + Hasta 6 cuotas sin intereses todos los días.", "2026-05-21", "2026-11-27", false], ["GNB", "Banco GNB SIL Run", ["-20%"], "20% de reintegro en la inscripción anticipada del evento.", "2026-07-08", "2026-09-06", false], ["GNB", "El Club del Sommelier", ["-30%"], "30% de reintegro en membresías.", "2024-10-13", "2026-12-31", false], ["GNB", "Dermocosmética", ["Off + cuotas"], "Hasta 25% de descuento + 3 cuotas sin intereses los días viernes y sábados.", "2026-05-17", "2026-11-28", false], ["GNB", "Peluquerías & Spa", ["Off y Cuotas"], "Hasta 25% de descuento + 3 cuotas sin intereses los días viernes y sábado.", "2026-05-17", "2026-11-28", false], ["GNB", "Forever 21", ["Off y Cuotas"], "Hasta 25% de descuento los días jueves y viernes + 6 cuotas sin intereses todos los días.", "2026-05-17", "2026-11-27", false], ["GNB", "Farmavip", ["-20%"], "20% de reintegro los días miércoles.", "2024-11-22", "2026-12-30", false], ["GNB", "Jade Bistro & Eminent Bistro", ["-20%"], "Hasta 20% de reintegro de miércoles a domingos.", "2025-07-18", "2026-12-31", false], ["GNB", "Blue Farma", ["Off y Cuotas"], "20% de descuento los lunes + Hasta 6 cuotas sin intereses todos los días.", "2026-03-05", "2026-12-28", false], ["GNB", "Pame Garelik Bags", ["Off y Cuotas"], "20% de descuento + Hasta 6 cuotas sin intereses los días sábados.", "2026-07-04", "2026-11-28", false], ["GNB", "Mongomery", ["-20%"], "20% de descuento los días sábados.", "2026-05-17", "2026-11-28", false], ["GNB", "Areté y Festa", ["-15%"], "Todos los días 15% off en supermercado y restaurante.", "2025-01-01", "2026-12-31", false], ["GNB", "Farmatotal", ["Off y Cuotas"], "Hasta 35% de descuento + 3 cuotas sin intereses los días jueves.", "2024-10-02", "2026-12-31", false], ["GNB", "Malandras Grill", ["-30%"], "30% de reintegro de miércoles a domingos.", "2025-06-18", "2026-11-01", false], ["GNB", "Inoga", ["Off y Cuotas"], "25% de descuento + Hasta 12 cuotas sin intereses todos los días.", "2025-06-20", "2026-09-30", false], ["GNB", "Penina Shoes - Galan For Men", ["-20%"], "20% de descuento los días sábados.", "2026-05-17", "2026-11-28", false], ["GNB", "Anouk - Hans & Baby An", ["Off y Cuotas"], "20% de descuento + Hasta 6 cuotas sin intereses los días jueves.", "2026-05-17", "2026-11-26", false], ["GNB", "Todo Cubierta", ["Off y Cuotas"], "20% de descuento en servicios, 5% en productos + Hasta 12 cuotas sin intereses.", "2025-08-07", "2026-12-31", false], ["GNB", "Paats & Paats", ["Off y Cuotas"], "20% de descuento + Hasta 6 cuotas sin intereses los días viernes.", "2026-05-17", "2026-11-27", false], ["GNB", "Hiperfiesta", ["-20%"], "20% de descuento todos los días.", "2025-09-05", "2026-12-31", false], ["GNB", "Supermercado AhorraMás", ["-25%"], "25% de reintegro los días jueves.", "2025-09-25", "2026-12-31", false], ["GNB", "Librería Emanuel", ["Off y Cuotas"], "20% de descuento los días viernes + Hasta 6 cuotas sin intereses.", "2026-04-10", "2026-10-30", false], ["GNB", "Meyer Lab", ["Off y Cuotas"], "20% de reintegro + Hasta 12 cuotas sin intereses de lunes a sábados.", "2025-10-28", "2026-12-31", false], ["GNB", "FCE", ["Off y Cuotas"], "15% de descuento + Hasta 12 cuotas sin intereses todos los días.", "2025-10-27", "2026-12-31", false], ["GNB", "Farmalife", ["-20%"], "20% de reintegro los días miércoles.", "2025-12-03", "2026-12-30", false], ["GNB", "Popeyes", ["-25%"], "Hasta 25% de reintegro los días lunes y martes.", "2026-01-12", "2026-12-29", false], ["GNB", "Mi Portal Coca Cola", ["-20%"], "20% de descuento los lunes.", "2026-06-08", "2026-12-28", false], ["GNB", "Padel Point", ["Off y Cuotas"], "10% de descuento el primer viernes de cada mes + Hasta 12 cuotas sin intereses todos los días.", "2026-02-16", "2026-12-31", false], ["GNB", "Jeep", ["Off y Cuotas"], "Hasta 25% de descuento los viernes + 6 cuotas sin intereses todos los días.", "2026-05-17", "2026-11-27", false], ["GNB", "Women'Secret", ["Off y Cuotas"], "60% de descuento + Hasta 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Jack & Jones", ["Off y Cuotas"], "60% de descuento + Hasta 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Gino Ventori", ["Off y Cuotas"], "25% off los jueves + 6 cuotas sin intereses.", "2026-05-17", "2026-11-26", false], ["GNB", "Melissa", ["Off y Cuotas"], "25% off los jueves + 6 cuotas sin intereses.", "2026-05-17", "2026-11-26", false], ["GNB", "Democrata", ["Off y Cuotas"], "25% off los jueves + 6 cuotas sin intereses.", "2026-05-17", "2026-11-26", false], ["GNB", "O Boticário", ["Off y Cuotas"], "Hasta 25% de descuento los jueves y viernes + Hasta 6 cuotas sin intereses todos los días.", "2026-05-17", "2026-11-27", false], ["GNB", "Isdin", ["Off y Cuotas"], "Hasta 25% de descuento los jueves y viernes + Hasta 6 cuotas sin intereses todos los días.", "2026-05-17", "2026-11-27", false], ["GNB", "Cerogrado", ["Off y Cuotas"], "Hasta 20% de descuento + Hasta 6 cuotas sin intereses los días jueves y viernes.", "2026-03-26", "2026-12-31", false], ["GNB", "Calzados Rajomar", ["Off y Cuotas"], "Hasta 20% de descuento + Hasta 6 cuotas sin intereses todos los sábados.", "2026-07-17", "2026-11-28", false], ["GNB", "Tienda Shelly", ["Off y Cuotas"], "20% de descuento + Hasta 6 cuotas sin intereses los sábados.", "2026-07-30", "2026-11-28", false], ["GNB", "Moët Hennessy", ["Off y Cuotas"], "Hasta 25% de descuento los jueves y viernes + Hasta 6 cuotas sin intereses todos los días.", "2026-08-25", "2026-12-31", false], ["GNB", "Alamo", ["Off y Cuotas"], "20% de reintegro + Hasta 6 cuotas sin intereses de lunes a sábados.", "2024-01-11", "2026-12-31", false], ["GNB", "El Molinillo", ["-20%"], "Todos los días 20% de reintegro.", "2024-01-01", "2026-12-31", false], ["GNB", "Tienda Piccolino", ["Off y Cuotas"], "20% off + 6 cuotas sin intereses.", "2026-05-17", "2026-12-31", false], ["GNB", "Patrol Jeans", ["Off y Cuotas"], "Hasta 25% de descuento + hasta 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Líder Supermercado", ["-15%"], "15% de reintegro los días jueves.", "2026-04-15", "2026-09-24", false], ["GNB", "Cat Town – Agrofield Web", ["Off y Cuotas"], "20% de reintegro + Hasta 6 cuotas sin intereses los días jueves.", "2026-07-02", "2026-12-31", false], ["GNB", "Agrofield – Fauna Town", ["Off y Cuotas"], "20% de reintegro + Hasta 6 cuotas sin intereses los días jueves y viernes de la tercera semana del mes.", "2026-07-02", "2026-12-18", false], ["GNB", "Di Valentini", ["Off y Cuotas"], "20% de descuento + Hasta 6 cuotas sin intereses los días sábados.", "2026-07-10", "2026-11-28", false], ["GNB", "Juguetería Me Encanta", ["Off y Cuotas"], "Hasta 25% off todos los jueves y viernes + 6 cuotas sin intereses todos los días.", "2026-05-17", "2026-11-27", false], ["GNB", "Literato", ["Off y Cuotas"], "Hasta 25% off + 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "New Balance", ["Off y Cuotas"], "Hasta 25% de descuento los viernes + 6 cuotas sin intereses todos los días.", "2026-05-17", "2026-11-27", false], ["GNB", "Charpentier", ["Off y Cuotas"], "Todos los días 15% de descuento + Hasta 6 cuotas sin intereses.", "2026-05-18", "2026-12-31", false], ["GNB", "Body Club", ["Off y Cuotas"], "25% off los jueves y viernes + 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Tonina", ["Off y Cuotas"], "20% off todos los miércoles + 12 cuotas sin intereses todos los días.", "2024-01-01", "2026-12-30", false], ["GNB", "Denoir", ["Off y Cuotas"], "Hasta 25% de descuento los jueves y viernes + Hasta 12 cuotas sin intereses todos los días.", "2026-05-17", "2026-11-27", false], ["GNB", "Cole Haan", ["Off y Cuotas"], "25% off los viernes + 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Tu Almacén FD", ["Off y Cuotas"], "Hasta 25% de descuento + Hasta 3 cuotas sin intereses los días viernes.", "2026-05-17", "2026-12-25", false], ["GNB", "Burger King", ["-25%"], "Todos los jueves hasta 25% off.", "2024-01-01", "2026-12-31", false], ["GNB", "Outdoors", ["Off y Cuotas"], "25% off todos los viernes + 6 cuotas sin intereses todos los días.", "2026-05-17", "2026-11-27", false], ["GNB", "Crocs", ["Off y Cuotas"], "Hasta 25% off los viernes + 6 cuotas sin intereses todos los días.", "2026-05-17", "2026-11-27", false], ["GNB", "Timberland", ["Off y Cuotas"], "25% off los viernes + 6 cuotas sin intereses todos los días.", "2026-05-17", "2026-11-27", false], ["GNB", "La Nutry Healthy Food", ["-25%"], "Hasta 25% de reintegro de lunes a viernes.", "2026-05-18", "2026-12-31", false], ["GNB", "Urban Haus", ["Off y Cuotas"], "25% off los jueves y viernes + 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Nike - Rookie - Academy - Rise", ["Off y Cuotas"], "Hasta 25% off los jueves + 6 cuotas sin intereses.", "2026-05-17", "2026-11-26", false], ["GNB", "360 Sneaker Store", ["Off y Cuotas"], "Todos los jueves hasta 25% de descuento + Hasta 6 cuotas sin intereses.", "2026-05-17", "2026-11-26", false], ["GNB", "Meta Sports", ["Off y Cuotas"], "Todos los jueves hasta 25% de descuento + Hasta 6 cuotas sin intereses.", "2026-05-17", "2026-11-26", false], ["GNB", "Armele", ["Off y Cuotas"], "25% de descuento los jueves y viernes + Hasta 12 cuotas sin intereses todos los días.", "2026-05-17", "2026-11-27", false], ["GNB", "Juank Servicios y Repuestos", ["Off y Cuotas"], "10% Off y hasta 6 cuotas sin intereses.", "2024-01-01", "2026-12-31", false], ["GNB", "Casa Paraná", ["-25%"], "25% de descuento todos los sábados.", "2026-05-17", "2026-11-28", false], ["GNB", "Chiqui Chic", ["Off y Cuotas"], "20% off sobre la seña y hasta 12 cuotas sin intereses.", "2023-09-28", "2026-12-31", false], ["GNB", "Essen", ["Off y Cuotas"], "Hasta 25% de descuento + 12 cuotas sin intereses todos los días.", "2024-10-02", "2026-12-31", false], ["GNB", "Librería Nova", ["Off y Cuotas"], "20% de descuento + Hasta 6 cuotas sin intereses.", "2026-06-16", "2026-11-30", false], ["GNB", "Vans", ["Off y Cuotas"], "25% off los jueves + 6 cuotas sin intereses.", "2026-05-17", "2026-11-26", false], ["GNB", "La Casita Gourmet de Yudith", ["-20%"], "Hasta 20% off de lunes a sábado.", "2024-02-19", "2026-12-31", false], ["GNB", "Drugstore Asismed", ["-32%"], "Hasta 32% off + 10% de reintegro adicional.", "2024-06-01", "2026-12-31", false], ["GNB", "Petrochaco", ["-20%"], "20% de descuento los días martes.", "2024-08-29", "2026-12-29", false], ["GNB", "Deport Center", ["Off y Cuotas"], "Hasta 25% de descuento + 6 cuotas sin intereses.", "2026-05-17", "2026-11-28", false], ["GNB", "Hydro Clean", ["Off y Cuotas"], "20% de descuento y hasta 12 cuotas sin intereses todos los días.", "2024-10-07", "2026-12-31", false], ["GNB", "Decanter Vinos Boutique", ["Off y Cuotas"], "Hasta 15% de descuento en productos seleccionados + Hasta 6 cuotas sin intereses.", "2024-10-15", "2026-12-31", false], ["GNB", "Supermercado Jullito", ["-20%"], "20% de descuento todos los lunes.", "2024-11-04", "2026-11-28", false], ["GNB", "Supermercado Súper 2", ["-20%"], "Hasta 20% de reintegro todos los jueves.", "2024-12-05", "2026-12-31", false], ["GNB", "Arte Actual", ["Off y Cuotas"], "10% de descuento + hasta 12 cuotas sin intereses todos los días.", "2024-12-01", "2026-12-31", false], ["GNB", "Adidas", ["Off y Cuotas"], "Todos los jueves hasta 25% de descuento + Hasta 6 cuotas sin intereses.", "2026-05-17", "2026-11-26", false], ["GNB", "Librería Kawaii – Colegio Cristo Rey", ["-20%"], "20% de descuento de lunes a viernes.", "2025-01-20", "2026-12-31", false], ["GNB", "Asado Benitez", ["-20%"], "20% de reintegro todos los días.", "2025-03-17", "2026-12-31", false], ["GNB", "Avenida Autocentro", ["Off y Cuotas"], "30% de descuento + Hasta 12 cuotas sin intereses todos los días.", "2025-03-18", "2026-12-31", false], ["GNB", "CDC Calzados", ["-20%"], "20% de descuento los sábados.", "2026-05-17", "2026-11-28", false], ["GNB", "Cecconello", ["Off y Cuotas"], "20% de descuento + Hasta 6 cuotas sin intereses los días sábados.", "2026-07-10", "2026-11-28", false], ["GNB", "Subway", ["-25%"], "Hasta 25% de reintegro de lunes a viernes.", "2025-04-25", "2026-12-31", false], ["GNB", "Aero", ["Off y Cuotas"], "25% off los jueves y viernes + 6 cuotas sin intereses.", "2026-05-18", "2026-11-27", false], ["GNB", "American Look", ["Off y Cuotas"], "25% off los jueves y viernes + 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Brooksfield", ["Off y Cuotas"], "25% off los jueves y viernes + 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Kappa", ["Off y Cuotas"], "25% off los jueves y viernes + 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Kenneth Cole", ["Off y Cuotas"], "25% off los jueves y viernes + 6 cuotas sin intereses.", "2026-05-18", "2026-11-27", false], ["GNB", "Lotto", ["Off y Cuotas"], "25% off los jueves y viernes + 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Puma", ["Off y Cuotas"], "25% off los jueves y viernes + 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Skechers", ["Off y Cuotas"], "25% off los jueves y viernes + 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Sport House", ["Off y Cuotas"], "25% off los jueves y viernes + 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["GNB", "Farfalle", ["Off y Cuotas"], "20% de descuento + Hasta 6 cuotas sin intereses todos los días.", "2026-03-23", "2026-12-31", false], ["GNB", "San Isidro Show Room", ["Off y Cuotas"], "15% de descuento + Hasta 12 cuotas sin intereses todos los días.", "2026-03-26", "2026-12-31", false], ["GNB", "Super Sac Supermercado", ["-15%"], "15% de reintegro los días jueves.", "2026-04-15", "2026-09-24", false], ["GNB", "For Pets", ["-20%"], "20% de descuento todos los días.", "2026-07-14", "2026-12-31", false], ["GNB", "Baza Rattán", ["Off y Cuotas"], "20% de descuento + Hasta 12 cuotas sin intereses.", "2026-07-14", "2026-12-31", false], ["GNB", "Safebag", ["-50%"], "Embalajes con reintegro.", "2024-06-01", "2026-12-31", false], ["GNB", "CAT", ["Off y Cuotas"], "25% off los viernes + 6 cuotas sin intereses.", "2026-05-17", "2026-11-27", false], ["Itau", "Skechers", ["6 Cuotas sin intereses", "20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito VISA INFINITE y AMEX PLATINUM de Itaú. Tenes 20% de ahorro y hasta 6 cuotas sin intereses. Aplica los viernes.", "2026-01-01", "2026-12-31", false], ["Itau", "Armele", ["20 %", "12 Cuotas sin intereses"], "El 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú PERSONAL BANK. Tenes 20% de ahorro y hasta 12 cuotas sin intereses.", "2023-08-30", "2026-12-31", false], ["Itau", "Marketplace", ["20 %", "10 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas The Platinum Card de American Express y Visa Infinite de Itaú. Tenés 20% de ahorro y hasta 10 cuotas sin intereses. Aplica al segundo martes de cada mes. Aplica a pagos con tarjeta, QR, Apple Pay y Google Pay.", "2026-01-13", "2026-12-31", false], ["Itau", "Ashley", ["20 %", "10 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas The Platinum Card de American Express y Visa Infinite de Itaú. Tenés 20% de ahorro y hasta 10 cuotas sin intereses. Aplica al segundo martes de cada mes. Aplica a pagos con tarjeta, QR, Apple Pay y Google Pay.", "2026-01-13", "2026-12-31", false], ["Itau", "Shell", ["25 %"], "Tanque lleno, todos los miércoles. Del 25 de febrero al 30 de septiembre de 2026. 25% de REINTEGRO con tu tarjeta de crédito VISA INFINTE y AMEX Platinum. Tope de compra Gs. 1.200.000 por mes, por cliente (titular + adicional).", "2026-01-07", "2026-09-30", false], ["Itau", "Aphrodite", ["20 %", "6 Cuotas sin intereses"], "Del 10 de agosto al 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú PERSONAL BANK. Tenes 20% de ahorro y hasta 6 cuotas sin intereses. Aplica los martes.", "2025-10-03", "2026-12-31", false], ["Itau", "Loccitane", ["20 %", "6 Cuotas sin intereses"], "Del 10 de agosto al 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú PERSONAL BANK. Tenes 20% de ahorro y hasta 6 cuotas sin intereses. Aplica los martes.", "2025-10-03", "2026-12-31", false], ["Itau", "Super Real", ["20 %"], "Desde el 2 de marzo hasta el 30 de septiembre de 2026. Pagando con tus tarjetas de crédito VISA INFINITE y AMEX PLATINUM de Itaú. Tenes 20% de reintegro. Aplica los lunes. Tope de compra Gs. 3.000.000 por cuenta/tarjeta en rubro supermercados.", "2025-09-01", "2026-09-30", false], ["Itau", "PedidosYa", ["25 %"], "Hasta el 31 de diciembre de 2026. Pagando con tu tarjeta de crédito Visa Infinite. Tenes 25% de ahorro. Tope de compra mensual de GS 600.000.", "2026-01-01", "2026-12-31", false], ["Itau", "Optica Vision", ["6 Cuotas sin intereses", "20 % (Amex)"], "Del 6 de enero al 21 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú AMEX PLATINUM y VISA INFINITE. Tenes hasta 20% de ahorro y hasta 6 cuotas sin intereses. Aplica en armazones y cristales. Aplica 10% de ahorro en lentes de contacto y rayban. Aplica los LUNES.", "2026-01-06", "2026-12-21", false], ["Itau", "Biggie", ["20 %"], "El viernes 4 de septiembre de 2026. Pagando con tus tarjetas de crédito VISA INFINITE Y AMEX PLATINUM de Itaú. Tenes 20% de reintegro. Aplica el primer viernes del mes. No aplica a delivery. Tope de compra Gs. 3.000.000 por cuenta/tarjeta en rubro supermercados.", "2025-08-01", "2026-09-04", false], ["Itau", "Pulsak", ["20 %", "6 Cuotas sin intereses"], "Del 16 de abril hasta el 17 de diciembre de 2026. Pagando con tus tarjetas de credito Itau VISA INFINITE y AMEX PLATINUM. Tenes 20% de ahorro y hasta 6 cuotas sin intereses. Aplica el tercer jueves de cada mes. Aplica a PLG, SOL, MCAL, COSTANERA, SAN LORENZO.", "2026-04-16", "2026-12-17", false], ["Itau", "TL Sports & Outdoors", ["20 % (Amex)", "6 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú VISA INFINITE y AMEX PLATINUM. Tenes 20% de ahorro y hasta 6 cuotas sin intereses. Aplica los viernes.", "2026-01-08", "2026-12-31", false], ["Itau", "Henley", ["20 % (Amex)", "6 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú VISA INFINITE y AMEX PLATINUM. Tenes 20% de ahorro y hasta 6 cuotas sin intereses. Aplica los viernes. TL SPORT & Henley: Aplica 15% en productos ON.", "2026-01-08", "2026-12-31", false], ["Itau", "TL Home", ["20 % (Amex)", "6 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú VISA INFINITE y AMEX PLATINUM. Tenes 20% de ahorro y hasta 6 cuotas sin intereses. Aplica los viernes.", "2026-01-08", "2026-12-31", false], ["Itau", "Hoka", ["20 % (Amex)", "6 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú VISA INFINITE y AMEX PLATINUM. Tenes 20% de ahorro y hasta 6 cuotas sin intereses. Aplica los viernes.", "2026-01-08", "2026-12-31", false], ["Itau", "Estudio Barcelona", ["10 Cuotas sin intereses", "10 %"], "Hasta el 31 de diciembre 2026. Pagando con tus tarjetas de crédito Itaú PERSONAL BANK. Tenes 10% de ahorro y hasta 10 cuotas sin intereses.", "2024-07-01", "2026-12-31", false], ["Itau", "Sanycer Boutique", ["10 Cuotas sin intereses", "42 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú VISA INFINITE y AMEX PLATINUM tenes 42% de ahorro y hasta 10 cuotas sin intereses. Aplica para boutique.", "2025-06-02", "2026-12-31", false], ["Itau", "Helpers", ["20 %", "6 Cuotas sin intereses"], "Del 30 de junio al 30 de Septiembre 2026. Pagando con tus tarjetas de crédito Itaú. Tenes 20% de ahorro y hasta 6 cuotas sin intereses.", "2026-07-01", "2026-09-30", false], ["Itau", "Gond Wana", ["20 %", "10 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas VISA INFINITE y AMEX PLATINUM de Itaú. Tenes 20% de ahorro y hasta 10 cuotas sin intereses. Aplica a dispensers.", "2026-01-12", "2026-12-31", false], ["Itau", "Plaza Hogar", ["20 %", "10 Cuotas sin intereses"], "Del 28 de enero hasta el 30 de Diciembre de 2026. Pagando con tus tarjetas de crédito VISA INFINITE Y AMEX PLATINUM Itaú. Tenes 20% de ahorro mas 10 cuotas sin intereses. Aplica el ultimo miércoles de cada mes durante la vigencia de la promo.", "2026-01-28", "2026-12-30", false], ["Itau", "Levis", ["6 Cuotas sin intereses", "15 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas The Platinum Card de American Express y VISA infinite. Tenés 15% de ahorro y hasta 6 cuotas sin intereses. Todos los jueves.", "2025-01-01", "2026-12-31", false], ["Itau", "7 For All", ["6 Cuotas sin intereses", "15 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas The Platinum Card de American Express y VISA infinite. Tenés 15% de ahorro y hasta 6 cuotas sin intereses. Todos los jueves.", "2025-01-01", "2026-12-31", false], ["Itau", "Gilardini", ["15 %", "6 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas The Platinum Card de American Express y Visa Infinite de Itaú. Tenés 15% de ahorro y hasta 6 cuotas sin intereses. Aplica los dias Jueves.", "2026-01-01", "2026-11-30", false], ["Itau", "Luminotecnia", ["20 %", "10 Cuotas sin intereses"], "Todos los sábados hasta el 26 de diciembre de 2026. Pagando con tus tarjetas de crédito VISA INFINITE y AMEX PLATINUM. Tenes 20% de ahorro y hasta 10 cuotas sin intereses. El descuento aplica únicamente a productos seleccionados.", "2026-01-10", "2026-12-26", false], ["Itau", "Fabric Sushi (tarde)", ["25 % Hasta"], "Del 2 al 30 septiembre de 2026. Pagando con tus tarjetas de crédito Itau. De lunes a jueves desde las 19hs. Tenes 20% de reintegro con todas las AMEX ITAU y 25% de reintegro con Tarjetas de Crédito Personal Bank. Exclusivo para Salón.", "2026-01-06", "2026-09-30", false], ["Itau", "Casa Viva", ["20 %", "10 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas The Platinum Card de American Express y VISA infinite. Tenés 20% de ahorro y hasta 10 cuotas sin intereses.", "2025-01-16", "2026-12-31", false], ["Itau", "Simmons", ["45 % Hasta", "12 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito VISA INFINITE Y AMEX PLATINUM. Tenes hasta 45% de ahorro y hasta 12 cuotas sin intereses.", "2026-01-01", "2026-12-31", false], ["Itau", "Coquetas Legacy", ["6 Cuotas sin intereses", "20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú. Tenes 20% de reintegro y hasta 6 cuotas sin intereses. Aplica los MIÉRCOLES, JUEVES Y VIERNES en Encarnación. Tope de compra hasta Gs. 1.000.000.", "2025-08-14", "2026-12-31", false], ["Itau", "Javi Deportes", ["6 Cuotas sin intereses", "20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú. Tenes 20% de reintegro y hasta 6 cuotas sin intereses. Aplica los MIÉRCOLES, JUEVES Y VIERNES en Encarnación. Tope de compra hasta Gs. 1.000.000.", "2025-08-14", "2026-12-31", false], ["Itau", "Rubens", ["6 Cuotas sin intereses", "20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú. Tenes 20% de reintegro y hasta 6 cuotas sin intereses. Aplica los MIÉRCOLES, JUEVES Y VIERNES en Encarnación. Tope de compra hasta Gs. 1.000.000.", "2025-08-14", "2026-12-31", false], ["Itau", "Siena Accesorios", ["6 Cuotas sin intereses", "20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú. Tenes 20% de reintegro y hasta 6 cuotas sin intereses. Aplica los MIÉRCOLES, JUEVES Y VIERNES en Encarnación. Tope de compra hasta Gs. 1.000.000.", "2025-08-14", "2026-12-31", false], ["Itau", "Rajomar", ["6 Cuotas sin intereses", "20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú. Tenes 20% de reintegro y hasta 6 cuotas sin intereses. Aplica los MIÉRCOLES, JUEVES Y VIERNES en Encarnación. Tope de compra hasta Gs. 1.000.000.", "2025-08-14", "2026-12-31", false], ["Itau", "Brave", ["6 Cuotas sin intereses", "20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú. Tenes 20% de reintegro y hasta 6 cuotas sin intereses. Aplica los MIÉRCOLES, JUEVES Y VIERNES en Encarnación. Tope de compra hasta Gs. 1.000.000.", "2025-08-14", "2026-12-31", false], ["Itau", "Única Moda", ["6 Cuotas sin intereses", "20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú. Tenes 20% de reintegro y hasta 6 cuotas sin intereses. Aplica los MIÉRCOLES, JUEVES Y VIERNES en Encarnación. Tope de compra hasta Gs. 1.000.000.", "2025-08-14", "2026-12-31", false], ["Itau", "Golden Closet", ["6 Cuotas sin intereses", "20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú. Tenes 20% de reintegro y hasta 6 cuotas sin intereses. Aplica los MIÉRCOLES, JUEVES Y VIERNES en Encarnación. Tope de compra hasta Gs. 1.000.000.", "2025-08-14", "2026-12-31", false], ["Itau", "Ñemonde", ["6 Cuotas sin intereses", "20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú. Tenes 20% de reintegro y hasta 6 cuotas sin intereses. Aplica los MIÉRCOLES, JUEVES Y VIERNES en Encarnación. Tope de compra hasta Gs. 1.000.000.", "2025-08-14", "2026-12-31", false], ["Itau", "Heladería Paris", ["20 %"], "Hasta el 31 de diciembre 2026. Pagando con tus tarjetas de crédito VISA INFINITE y AMEX PLATINUM de Itaú. Tenes 20% de ahorro. Aplica sábado y domingo.", "2025-05-28", "2026-12-31", false], ["Itau", "Haagen Dazs", ["20 %"], "Hasta el 31 de enero de 2027. Pagando con tus tarjetas de crédito VISA INFINITE y AMEX PLATINUM de Itaú. Tenes 20% de ahorro. Aplica sábado y domingo.", "2025-05-28", "2027-01-31", false], ["Itau", "Condor", ["15 %", "10 Cuotas sin intereses"], "Desde el 3 de marzo hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito Itaú VISA INFINITE y AMEX PLATINUM. Tenes 15% de ahorro y hasta 10 cuotas sin intereses. Aplica a repuestos y accesorios en stock.", "2026-03-03", "2026-12-31", false], ["Itau", "Centro Legrand", ["20 %", "12 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas VISA INFINITE y AMEX PLATINUM de Itaú. Tenes 20% de ahorro y hasta 12 cuotas sin intereses. Aplica todos los días. No aplica a faciales ni inyectables.", "2026-01-01", "2026-12-31", false], ["Itau", "Teranu", ["20 %", "6 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito VISA INFINITE y AMEX PLATINUM de Itaú. Tenes 20% de ahorro y hasta 6 cuotas sin intereses. Aplica los miércoles.", "2026-01-01", "2026-12-31", false], ["Itau", "Talleyrand", ["20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas The Platinum Card de American Express y Visa Infinite de Itaú. Tenés 20% de ahorro. Aplica de miércoles a domingo.", "2026-01-01", "2026-12-31", false], ["Itau", "La Maria Restaurante", ["20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas The Platinum Card de American Express y Visa Infinite de Itaú. Tenés 20% de ahorro. Aplica de miércoles a domingo.", "2026-01-01", "2026-12-31", false], ["Itau", "Maurice", ["20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas The Platinum Card de American Express y Visa Infinite de Itaú. Tenés 20% de ahorro. Aplica de miércoles a domingo.", "2026-01-01", "2026-12-31", false], ["Itau", "Josephine", ["20 %"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas The Platinum Card de American Express y Visa Infinite de Itaú. Tenés 20% de ahorro. Aplica de miércoles a domingo.", "2026-01-01", "2026-12-31", false], ["Itau", "Ottoboni", ["12 Cuotas sin intereses", "45 % (Amex)"], "Del 5 de enero al 31 de diciembre 2026. Pagando con tus tarjetas AMEX PLATINUM Y VISA INFINITE. Tenés hasta 45% de ahorro y hasta 12 cuotas sin intereses.", "2026-01-05", "2026-12-31", false], ["Itau", "SuperSeis", ["20 %"], "Desde el 7 de marzo hasta el 30 de septiembre de 2026. Pagando con tus tarjetas de crédito VISA INFINITE Y AMEX PLATINUM de Itaú. Tenes 20% de reintegro. Aplica los sábados. Tope de compra Gs.3.000.000 mensual por cuenta/tarjeta en rubro supermercados.", "2025-09-06", "2026-09-30", false], ["Itau", "Stock", ["20 %"], "Desde el 7 de marzo hasta el 30 de septiembre de 2026. Pagando con tus tarjetas de crédito VISA INFINITE Y AMEX PLATINUM de Itaú. Tenes 20% de reintegro. Aplica los sábados. Tope de compra Gs.3.000.000 mensual por cuenta/tarjeta en rubro supermercados.", "2025-09-06", "2026-09-30", false], ["Itau", "Vida Estética", ["20 % Hasta", "10 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas The Platinum Card de American Express y VISA infinite. Tenés hasta 20% de ahorro y hasta 10 cuotas sin intereses. Todos los jueves.", "2026-01-15", "2026-12-31", false], ["Itau", "Puma", ["20 % (Amex)", "6 Cuotas sin intereses"], "Hasta el 31 de diciembre de 2026. Pagando con tus tarjetas de crédito VISA INFINITE y AMEX PLATINUM de Itaú. Tenes 20% de ahorro y hasta 6 cuotas sin intereses. Aplica los viernes. No aplica colección CCP, APF, LIBERTAD.", "2026-01-01", "2026-12-31", false], ["Itau", "Fabric Sushi (mediodía)", ["35 % Hasta"], "Del 2 al 30 septiembre de 2026. Pagando con tus tarjetas de crédito Itau. De lunes a domingos de 12 a 16hs. Tenes 25% de reintegro con todas las AMEX ITAU y 35% de reintegro con Tarjetas de Crédito Personal Bank. Exclusivo para Salón.", "2026-01-01", "2026-09-30", false]];
+
+const TODAY = new Date();
+TODAY.setHours(0,0,0,0);
+
+const DAY_SHORT = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+const DAY_RE = [/lunes/i,/martes/i,/mi[ée]rcoles/i,/jueves/i,/viernes/i,/s[áa]bado/i,/domingo/i];
+
+function normDayWord(w){
+  w = w.replace(/s$/,'');
+  if(w.startsWith('mi')) return 2;
+  if(w.startsWith('lu')) return 0;
+  if(w.startsWith('ma')) return 1;
+  if(w.startsWith('ju')) return 3;
+  if(w.startsWith('vi')) return 4;
+  if(w.startsWith('s')) return 5;
+  if(w.startsWith('do')) return 6;
+  return -1;
+}
+
+// Finds explicit weekday mentions (ranges + individual names) in a lowercased string.
+// Does NOT special-case "todos los días" - callers decide how to use that phrase.
+function scanExplicitDays(t){
+  let days = new Set();
+  const rangeMatch = t.match(/de (lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bados?|domingos?)\s+a\s+(lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bados?|domingos?)/);
+  if(rangeMatch){
+    let a = normDayWord(rangeMatch[1]), b = normDayWord(rangeMatch[2]);
+    if(a>=0 && b>=0){
+      let i=a;
+      while(true){ days.add(i); if(i===b) break; i=(i+1)%7; }
+    }
+  }
+  DAY_RE.forEach((re,i)=>{ if(re.test(t)) days.add(i); });
+  return days;
+}
+
+function parseDays(desc){
+  const tFull = desc.toLowerCase();
+  const hasEveryDay = /todos los d[ií]as/.test(tFull);
+  if(!hasEveryDay){
+    return Array.from(scanExplicitDays(tFull)).sort((a,b)=>a-b);
+  }
+  // "todos los días" is present somewhere - it often qualifies only the cuotas
+  // clause (e.g. "20% los miércoles + 12 cuotas sin intereses todos los días"),
+  // not the discount itself. Split on '+' and drop whichever clause(s) contain
+  // the "todos los días" phrase before scanning for an explicit weekday.
+  const clauses = desc.split('+');
+  const nonEveryClauses = clauses.filter(c => !/todos los d[ií]as/i.test(c));
+  const specific = scanExplicitDays(nonEveryClauses.join(' ').toLowerCase());
+  if(specific.size > 0){
+    return Array.from(specific).sort((a,b)=>a-b);
+  }
+  // no other weekday mentioned anywhere - genuinely applies every day
+  return [0,1,2,3,4,5,6];
+}
+
+function parseDate(s){
+  const [y,m,d] = s.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+
+const todayIdx = (TODAY.getDay()+6)%7;
+
+// --- Non-weekly recurrence detection ---
+// Some deals are NOT "every Monday" style: they're a single specific date
+// ("el miércoles 9 de septiembre de 2026") or a monthly occurrence
+// ("el último miércoles de cada mes", "tercera semana del mes"). Treating
+// those as weekly-recurring is wrong, so they're classified separately and
+// excluded from the weekly day-of-week grid.
+const MONTHS_ES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const ORDINAL_MAP = {'primer':1,'primero':1,'segundo':2,'tercer':3,'tercero':3,'cuarto':4,'último':'last','ultimo':'last'};
+const WEEK_ORDINAL_MAP = {'primera':1,'segunda':2,'tercera':3,'cuarta':4,'última':'last','ultima':'last'};
+
+function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function nthWeekdayOfMonth(year, month, weekdayIdx, n){
+  if(n==='last'){
+    let d = new Date(year, month+1, 0);
+    while(((d.getDay()+6)%7) !== weekdayIdx){ d.setDate(d.getDate()-1); }
+    return d;
+  }
+  let d = new Date(year, month, 1);
+  let count = 0;
+  while(true){
+    if(((d.getDay()+6)%7) === weekdayIdx){ count++; if(count===n) return d; }
+    d.setDate(d.getDate()+1);
+    if(d.getMonth()!==month) return null;
+  }
+}
+
+function sameDate(a,b){ return a && b && a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+
+function classifyRecurrence(desc){
+  const ordM = desc.match(/(primer|primero|segundo|tercer|tercero|cuarto|último|ultimo)\s+(lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo)/i);
+  if(ordM){
+    const ord = ORDINAL_MAP[ordM[1].toLowerCase()];
+    const wd = normDayWord(ordM[2].toLowerCase());
+    const occ = nthWeekdayOfMonth(TODAY.getFullYear(), TODAY.getMonth(), wd, ord);
+    return {
+      type:'monthly',
+      note: capitalize(ordM[0]) + ' de cada mes',
+      activeToday: sameDate(occ, TODAY)
+    };
+  }
+  const weekM = desc.match(/(primera|segunda|tercera|cuarta|última|ultima)\s+semana\s+del?\s+mes/i);
+  if(weekM){
+    const wds = Array.from(scanExplicitDays(desc.toLowerCase()));
+    const ord = WEEK_ORDINAL_MAP[weekM[1].toLowerCase()];
+    // week N = days [(N-1)*7+1 .. N*7] of the month (week "last" = final 7 days)
+    let rangeStart, rangeEnd;
+    const lastDom = new Date(TODAY.getFullYear(), TODAY.getMonth()+1, 0).getDate();
+    if(ord==='last'){ rangeStart = lastDom-6; rangeEnd = lastDom; }
+    else { rangeStart = (ord-1)*7+1; rangeEnd = ord*7; }
+    const dom = TODAY.getDate();
+    const inRange = dom>=rangeStart && dom<=rangeEnd;
+    const todayMatchesWd = wds.includes(todayIdx);
+    return {
+      type:'monthly',
+      note: capitalize(weekM[0]) + (wds.length? ' (' + wds.map(i=>DAY_SHORT[i]).join('/') + ')' : ''),
+      activeToday: inRange && todayMatchesWd
+    };
+  }
+  const dateM = desc.match(/(lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo)\s+(\d{1,2})\s+de\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)(?:\s+de[l]?\s+(\d{4}))?/i);
+  if(dateM){
+    const day = parseInt(dateM[2],10);
+    const monthIdx = MONTHS_ES.indexOf(dateM[3].toLowerCase());
+    const year = dateM[4] ? parseInt(dateM[4],10) : TODAY.getFullYear();
+    const exactDate = new Date(year, monthIdx, day);
+    return {
+      type:'onetime',
+      note: 'Fecha única: ' + capitalize(dateM[0]),
+      activeToday: sameDate(exactDate, TODAY)
+    };
+  }
+  return null;
+}
+
+const items = DATA.map((row,idx)=>{
+  const [bank,n,badges,d,s,e,h] = row;
+  const start = parseDate(s), end = parseDate(e);
+  const special = classifyRecurrence(d);
+  const days = special ? [] : parseDays(d);
+  const inWindow = TODAY >= start && TODAY <= end;
+  const daysLeft = Math.round((end - TODAY)/86400000);
+  const isExpiring = inWindow && daysLeft <= 30 && daysLeft >= 0;
+  const activeToday = special ? (inWindow && special.activeToday) : (inWindow && (days.length===0 || days.includes(todayIdx)));
+  const id = bank + '::' + n;
+  return {idx, id, bank, n, badges, d, start, end, days, special, h:!!h, inWindow, daysLeft, isExpiring, activeToday};
+});
+
+let favorites = new Set();
+let favLoaded = false;
+let state = { bank:'all', extra:null, day:null, query:'' };
+
+function fmtDate(dt){ return dt.toLocaleDateString('es-PY',{day:'2-digit',month:'short'}); }
+
+function badgeClass(bank, bd){
+  if(bank==='Itau') return /cuota/i.test(bd) ? 'cuotas' : 'itaupct';
+  return /cuota/i.test(bd) ? 'cuotas' : 'off';
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadFavorites(){
+  try{
+    const raw = localStorage.getItem('gnb-itau-favorite-merchants');
+    if(raw){
+      favorites = new Set(JSON.parse(raw));
+    }
+  }catch(e){
+    favorites = new Set();
+  }
+  favLoaded = true;
+}
+
+async function saveFavorites(){
+  try{
+    localStorage.setItem('gnb-itau-favorite-merchants', JSON.stringify(Array.from(favorites)));
+  }catch(e){ /* best effort - private browsing / storage disabled */ }
+}
+
+function toggleFavorite(id){
+  if(favorites.has(id)) favorites.delete(id);
+  else favorites.add(id);
+  saveFavorites();
+  render();
+}
+
+function renderFocus(){
+  const favItems = items.filter(it=>favorites.has(it.id));
+  const activeNow = favItems.filter(it=>it.activeToday);
+  document.getElementById('focusCount').textContent = favorites.size ? `${activeNow.length} de ${favItems.length} hoy` : '';
+  const body = document.getElementById('focusBody');
+  if(favorites.size===0){
+    body.innerHTML = '<span class="focus-empty">Todavía no tenés favoritos. Tocá la ☆ en cualquier comercio de la lista para que aparezca acá cuando tenga beneficio hoy.</span>';
+    return;
+  }
+  if(activeNow.length===0){
+    body.innerHTML = '<span class="focus-none-today">Ninguno de tus favoritos tiene beneficio hoy.</span>';
+    return;
+  }
+  activeNow.sort((a,b)=>a.n.localeCompare(b.n,'es'));
+  document.getElementById('focusBody').innerHTML = '<div class="focus-list">' + activeNow.map(it=>{
+    const badgeHtml = it.badges.map(bd=>`<span class="badge ${badgeClass(it.bank,bd)}">${escapeHtml(bd)}</span>`).join('');
+    return `<div class="focus-item">
+      <div>
+        <div class="fi-name">${escapeHtml(it.n)} <span class="bank-tag ${it.bank==='Itau'?'itau':'gnb'}">${it.bank==='Itau'?'Itaú':'GNB'}</span></div>
+        <div class="fi-desc">${escapeHtml(it.d)}</div>
+      </div>
+      <div class="fi-badges">${badgeHtml}</div>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+function render(){
+  const q = state.query.trim().toLowerCase();
+  let filtered = items.filter(it=>{
+    if(state.day!==null && !(it.inWindow && it.days.includes(state.day))) return false;
+    if(state.bank!=='all' && it.bank!==state.bank) return false;
+    if(state.extra==='featured' && !it.h) return false;
+    if(state.extra==='expiring' && !it.isExpiring) return false;
+    if(state.extra==='fav' && !favorites.has(it.id)) return false;
+    if(q && !(it.n.toLowerCase().includes(q) || it.d.toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  filtered.sort((a,b)=>{
+    const af = favorites.has(a.id), bf = favorites.has(b.id);
+    if(af!==bf) return af? -1:1;
+    if(a.h!==b.h) return a.h? -1:1;
+    if(a.isExpiring!==b.isExpiring) return a.isExpiring? -1:1;
+    return a.n.localeCompare(b.n,'es');
+  });
+
+  const grid = document.getElementById('cards');
+  const empty = document.getElementById('emptyState');
+  if(filtered.length===0){
+    grid.innerHTML=''; empty.style.display='block';
+  } else {
+    empty.style.display='none';
+    grid.innerHTML = filtered.map(it=>{
+      const isFav = favorites.has(it.id);
+      let tags;
+      if(it.special){
+        tags = `<span class="day-tag special">${escapeHtml(it.special.note)}</span>`;
+      } else if(it.days.length===7){
+        tags = '<span class="day-tag">Todos los días</span>';
+      } else if(it.days.length===0){
+        tags = '<span class="day-tag">Sin día específico</span>';
+      } else {
+        tags = it.days.map(di=>`<span class="day-tag">${DAY_SHORT[di]}</span>`).join('');
+      }
+      const expiryLabel = it.inWindow ? (it.isExpiring ? `Vence en ${it.daysLeft}d` : `Hasta ${fmtDate(it.end)}`) : `Desde ${fmtDate(it.start)}`;
+      const badgeHtml = it.badges.map(bd=>`<span class="badge ${badgeClass(it.bank,bd)}">${escapeHtml(bd)}</span>`).join('');
+      return `<div class="card ${it.isExpiring?'expiring':''} ${isFav?'is-fav':''}">
+        <div class="card-head">
+          <div class="name-row">
+            <h3>${escapeHtml(it.n)}</h3>
+            <span class="bank-tag ${it.bank==='Itau'?'itau':'gnb'}">${it.bank==='Itau'?'Itaú':'GNB'}</span>
+          </div>
+          <button class="star-btn ${isFav?'active':''}" data-favid="${escapeHtml(it.id)}" aria-label="Favorito">${isFav?'★':'☆'}</button>
+        </div>
+        <div class="badges">${badgeHtml}</div>
+        <p class="desc">${escapeHtml(it.d)}</p>
+        <div class="card-foot">
+          <div class="days-tags">${tags}</div>
+          <span class="expiry ${it.isExpiring?'soon':''}">${expiryLabel}</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    grid.querySelectorAll('.star-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ toggleFavorite(btn.dataset.favid); });
+    });
+  }
+
+  document.getElementById('resultCount').textContent = `${filtered.length} de ${items.length} beneficios`;
+  const anyFilter = state.bank!=='all' || state.extra!==null || state.day!==null || q!=='';
+  document.getElementById('clearBtn').style.display = anyFilter ? 'inline' : 'none';
+
+  document.querySelectorAll('.day-cell').forEach((cell,i)=>{
+    const count = items.filter(it=>!it.special && it.inWindow && it.days.includes(i)).length;
+    cell.querySelector('.dcount').textContent = count;
+    cell.classList.toggle('active', state.day===i);
+  });
+
+  document.getElementById('cnt-all').textContent = items.length;
+  document.getElementById('cnt-gnb').textContent = items.filter(it=>it.bank==='GNB').length;
+  document.getElementById('cnt-itau').textContent = items.filter(it=>it.bank==='Itau').length;
+  document.getElementById('cnt-feat').textContent = items.filter(it=>it.h).length;
+  document.getElementById('cnt-exp').textContent = items.filter(it=>it.isExpiring).length;
+  document.getElementById('cnt-fav-chip').textContent = favorites.size;
+
+  document.querySelectorAll('#bankRail .chip').forEach(ch=>{
+    ch.classList.toggle('active', ch.dataset.bank===state.bank);
+  });
+  document.querySelectorAll('#extraRail .chip').forEach(ch=>{
+    ch.classList.toggle('active', ch.dataset.extra===state.extra);
+  });
+
+  renderFocus();
+}
+
+const weekEl = document.getElementById('week');
+weekEl.innerHTML = DAY_SHORT.map((label,i)=>`
+  <div class="day-cell ${i===todayIdx?'is-today':''}" data-day="${i}">
+    <span class="dname">${label}</span>
+    <span class="dcount">0</span>
+  </div>`).join('');
+
+weekEl.querySelectorAll('.day-cell').forEach(cell=>{
+  cell.addEventListener('click', ()=>{
+    const d = Number(cell.dataset.day);
+    state.day = state.day===d ? null : d;
+    render();
+  });
+});
+
+document.querySelectorAll('#bankRail .chip').forEach(ch=>{
+  ch.addEventListener('click', ()=>{ state.bank = ch.dataset.bank; render(); });
+});
+document.querySelectorAll('#extraRail .chip').forEach(ch=>{
+  ch.addEventListener('click', ()=>{
+    state.extra = state.extra===ch.dataset.extra ? null : ch.dataset.extra;
+    render();
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', e=>{ state.query = e.target.value; render(); });
+
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  state = {bank:'all', extra:null, day:null, query:''};
+  document.getElementById('searchInput').value='';
+  render();
+});
+
+document.getElementById('todayChip').textContent = 'Hoy: ' + TODAY.toLocaleDateString('es-PY',{weekday:'long', day:'numeric', month:'long'});
+
+(async function init(){
+  await loadFavorites();
+  render();
+})();
+</script>
+</body>
+</html>
